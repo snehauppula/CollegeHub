@@ -12,8 +12,8 @@ NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID=261316645477-fpb8kfldqml5o0scblqfj1ea071a2ca0.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 
 # JWT Secret
 JWT_SECRET=collegehub-super-secret-jwt-key-2024
