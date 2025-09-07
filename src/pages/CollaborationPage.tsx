@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
+import { useNavigate } from 'react-router-dom';
 import { 
   MessageCircle, 
   Users, 
@@ -7,11 +8,11 @@ import {
   Code, 
   Palette, 
   BookOpen,
-  Plus,
   Search,
   Filter,
   Star,
-  Clock
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 
 interface Project {
@@ -28,7 +29,8 @@ interface Project {
 }
 
 function CollaborationPage() {
-  const [activeTab, setActiveTab] = useState<'projects' | 'networking' | 'create'>('projects');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'projects' | 'networking'>('projects');
   const [searchTerm, setSearchTerm] = useState('');
 
   const mockProjects: Project[] = [
@@ -107,8 +109,7 @@ function CollaborationPage() {
             <div className="flex space-x-2">
               {[
                 { id: 'projects', label: 'Projects', icon: Briefcase },
-                { id: 'networking', label: 'Networking', icon: Users },
-                { id: 'create', label: 'Create Project', icon: Plus }
+                { id: 'networking', label: 'Networking', icon: Users }
               ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
@@ -129,83 +130,26 @@ function CollaborationPage() {
 
         {/* Projects Tab */}
         {activeTab === 'projects' && (
-          <div>
-            {/* Search and Filter */}
-            <div className="flex flex-col md:flex-row gap-4 mb-8">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300"
-                />
+          <div className="text-center py-16">
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-12 border border-white/20 max-w-2xl mx-auto">
+              <Briefcase className="h-16 w-16 text-cyan-400 mx-auto mb-6" />
+              <h2 className="text-3xl font-bold text-white mb-4">Project Collaboration Hub</h2>
+              <p className="text-gray-300 mb-8">
+                Discover exciting projects, collaborate with fellow students, and bring your ideas to life. 
+                Create your own projects or join existing ones to build something amazing together.
+              </p>
+              <div className="space-y-4">
+                <button 
+                  onClick={() => navigate('/projects')}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+                >
+                  <span>Explore Projects</span>
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+                <p className="text-sm text-gray-400">
+                  View all projects • Create new projects • Join collaborations
+                </p>
               </div>
-              <button className="flex items-center space-x-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all duration-300">
-                <Filter className="h-5 w-5" />
-                <span>Filter</span>
-              </button>
-            </div>
-
-            {/* Projects Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {mockProjects.map((project) => (
-                <div key={project.id} className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-white/30 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl">
-                        {getCategoryIcon(project.category)}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
-                          {project.title}
-                        </h3>
-                        <p className="text-sm text-purple-200">{project.category}</p>
-                      </div>
-                    </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(project.difficulty)}`}>
-                      {project.difficulty}
-                    </span>
-                  </div>
-
-                  <p className="text-gray-300 mb-4">{project.description}</p>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.skills.map((skill, index) => (
-                      <span key={index} className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs rounded-full border border-cyan-500/30">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4 text-sm text-gray-300">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>{project.members}/{project.maxMembers}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{project.timeCommitment}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-4 w-4 text-yellow-400" />
-                      <span className="text-yellow-400">4.8</span>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-3">
-                    <button className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300">
-                      Join Project
-                    </button>
-                    <button className="px-4 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl text-white transition-all duration-300">
-                      <MessageCircle className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -231,60 +175,6 @@ function CollaborationPage() {
           </div>
         )}
 
-        {/* Create Project Tab */}
-        {activeTab === 'create' && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-              <h2 className="text-3xl font-bold text-white mb-6 text-center">Create New Project</h2>
-              <form className="space-y-6">
-                <div>
-                  <label className="block text-white font-semibold mb-2">Project Title</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300"
-                    placeholder="Enter your project title..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-white font-semibold mb-2">Description</label>
-                  <textarea
-                    rows={4}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 resize-none"
-                    placeholder="Describe your project..."
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-semibold mb-2">Category</label>
-                    <select className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:border-cyan-400 transition-all duration-300">
-                      <option value="">Select category</option>
-                      <option value="technology">Technology</option>
-                      <option value="research">Research</option>
-                      <option value="creative">Creative</option>
-                      <option value="business">Business</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-white font-semibold mb-2">Team Size</label>
-                    <input
-                      type="number"
-                      min="2"
-                      max="20"
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300"
-                      placeholder="Max team members"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
-                >
-                  Create Project
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </Layout>
   );

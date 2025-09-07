@@ -1,0 +1,42 @@
+/* Custom dropdown styling for better visibility */
+.custom-select {
+  color-scheme: dark;
+}
+
+.custom-select option {
+  background-color: #1f2937 !important;
+  color: white !important;
+  padding: 8px 12px;
+  border: none;
+}
+
+.custom-select option:hover {
+  background-color: #374151 !important;
+}
+
+.custom-select option:checked {
+  background-color: #3b82f6 !important;
+}
+
+.custom-select option:focus {
+  background-color: #3b82f6 !important;
+}
+
+/* For webkit browsers (Chrome, Safari, Edge) */
+.custom-select::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-select::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 4px;
+}
+
+.custom-select::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.custom-select::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

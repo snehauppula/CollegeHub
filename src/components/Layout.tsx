@@ -28,6 +28,7 @@ function Layout({ children, title, showBackButton = true }: LayoutProps) {
               <button
                 onClick={() => navigate('/')}
                 className="p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+                title="Go to home page"
               >
                 <ArrowLeft className="h-6 w-6 text-white" />
               </button>

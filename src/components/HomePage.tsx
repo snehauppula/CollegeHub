@@ -12,9 +12,11 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 function HomePage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
@@ -38,26 +40,59 @@ function HomePage() {
             </div>
           </div>
           
-          {/* Login Buttons */}
+          {/* User Actions */}
           <div className="flex space-x-4">
-            <button 
-              onClick={() => navigate('/organizer-login')}
-              className="group px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 border border-purple-500/30"
-            >
-              <div className="flex items-center space-x-2">
-                <UserCheck className="h-5 w-5" />
-                <span>Log in as Club Organizer</span>
-              </div>
-            </button>
-            <button 
-              onClick={() => navigate('/student-login')}
-              className="group px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 border border-white/20 hover:border-white/30"
-            >
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5" />
-                <span>Log in as Student</span>
-              </div>
-            </button>
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center space-x-3 text-white">
+                  {user?.profilePicture ? (
+                    <img 
+                      src={user.profilePicture} 
+                      alt="Profile" 
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <Users className="h-4 w-4" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-gray-300">
+                      {user?.isOrganizer ? 'Organizer' : 'User'}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => navigate('/events')}
+                  className="group px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 border border-green-500/30"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-5 w-5" />
+                    <span>View Events</span>
+                  </div>
+                </button>
+                <button 
+                  onClick={logout}
+                  className="group px-6 py-3 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 border border-white/20"
+                >
+                  <div className="flex items-center space-x-2">
+                    <UserCheck className="h-5 w-5" />
+                    <span>Logout</span>
+                  </div>
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={() => navigate('/login')}
+                className="group px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-500 hover:to-purple-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 border border-blue-500/30"
+              >
+                <div className="flex items-center space-x-2">
+                  <Users className="h-5 w-5" />
+                  <span>Login with Google</span>
+                </div>
+              </button>
+            )}
           </div>
         </nav>
       </header>
