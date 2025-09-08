@@ -1,0 +1,3 @@
+[33m4e7cd54[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix: Move refresh button to top-right corner and remove hardcoded OAuth secrets
+[33m33ff9d0[m Implement authentication and event management features; refactor event data handling to use MongoDB. Add user context for authentication, create and edit event forms, and enhance UI components for better user experience.
+[33m28fbabc[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Start repository
