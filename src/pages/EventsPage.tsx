@@ -161,27 +161,63 @@ function EventsPage() {
               </div>
             ))}
           </div>
+        ) : events.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center">
+              <Calendar className="h-12 w-12 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">No Events Found</h3>
+            <p className="text-gray-400 mb-6">Check back later for exciting campus events!</p>
+            {user?.isOrganizer && (
+              <button
+                onClick={handleCreateEvent}
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Create First Event</span>
+              </button>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <div key={event._id} className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-white/30 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`px-3 py-1 bg-gradient-to-r ${getFeeColor(event.fee)} text-white text-xs font-semibold rounded-full`}>
-                    {event.fee === '0' ? 'Free' : `$${event.fee}`}
-                  </span>
-                  <div className="flex items-center space-x-2">
+              <div key={event._id} className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-cyan-500/10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex flex-col space-y-2">
+                    <span className={`inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r ${getFeeColor(event.fee)} text-white text-sm font-semibold rounded-full shadow-lg min-w-[60px]`}>
+                      {event.fee === '0' ? (
+                        <>
+                          <span className="w-2 h-2 bg-white rounded-full mr-2"></span>
+                          Free
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-lg mr-1">₹</span>
+                          {event.fee}
+                        </>
+                      )}
+                    </span>
+                    {event.joinLink && (
+                      <span className="inline-flex items-center px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">
+                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 animate-pulse"></span>
+                        Join Link Available
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center space-x-1">
                     {isEventOwner(event) && (
                       <>
                         <button
                           onClick={() => handleEditEvent(event)}
-                          className="text-yellow-400 hover:text-yellow-300 transition-colors"
+                          className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-all duration-200 hover:scale-110"
                           title="Edit Event"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteEvent(event._id)}
-                          className="text-red-400 hover:text-red-300 transition-colors"
+                          className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-all duration-200 hover:scale-110"
                           title="Delete Event"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -193,8 +229,8 @@ function EventsPage() {
                         href={event.joinLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-cyan-400 hover:text-cyan-300 transition-colors"
-                        title="Join Event"
+                        className="p-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 rounded-lg transition-all duration-200 hover:scale-110"
+                        title="Open Join Link"
                       >
                         <ExternalLink className="h-4 w-4" />
                       </a>
@@ -202,34 +238,43 @@ function EventsPage() {
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
-                  {event.eventName}
-                </h3>
-                <p className="text-cyan-200 text-sm mb-3">{event.clubName}</p>
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors line-clamp-2">
+                    {event.eventName}
+                  </h3>
+                  <p className="text-cyan-200 text-sm font-medium">{event.clubName}</p>
+                </div>
                 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center space-x-2 text-sm text-gray-300">
-                    <Calendar className="h-4 w-4 text-cyan-400" />
-                    <span>{event.eventDate}</span>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3 text-sm">
+                    <div className="flex items-center justify-center w-8 h-8 bg-cyan-500/20 rounded-lg">
+                      <Calendar className="h-4 w-4 text-cyan-400" />
+                    </div>
+                    <span className="text-gray-300 font-medium">{event.eventDate}</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-300">
-                    <MapPin className="h-4 w-4 text-pink-400" />
-                    <span>{event.eventVenue}</span>
+                  
+                  <div className="flex items-center space-x-3 text-sm">
+                    <div className="flex items-center justify-center w-8 h-8 bg-pink-500/20 rounded-lg">
+                      <MapPin className="h-4 w-4 text-pink-400" />
+                    </div>
+                    <span className="text-gray-300 font-medium">{event.eventVenue}</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-300">
-                    <DollarSign className="h-4 w-4 text-green-400" />
-                    <span>{event.fee === '0' ? 'Free Event' : `Fee: $${event.fee}`}</span>
-                  </div>
+                  
                   {event.gmail && (
-                    <div className="flex items-center space-x-2 text-sm text-gray-300">
-                      <Mail className="h-4 w-4 text-blue-400" />
-                      <span className="truncate">{event.gmail}</span>
+                    <div className="flex items-center space-x-3 text-sm">
+                      <div className="flex items-center justify-center w-8 h-8 bg-blue-500/20 rounded-lg">
+                        <Mail className="h-4 w-4 text-blue-400" />
+                      </div>
+                      <span className="text-gray-300 font-medium truncate">{event.gmail}</span>
                     </div>
                   )}
+                  
                   {event.phone && (
-                    <div className="flex items-center space-x-2 text-sm text-gray-300">
-                      <Phone className="h-4 w-4 text-purple-400" />
-                      <span>{event.phone}</span>
+                    <div className="flex items-center space-x-3 text-sm">
+                      <div className="flex items-center justify-center w-8 h-8 bg-purple-500/20 rounded-lg">
+                        <Phone className="h-4 w-4 text-purple-400" />
+                      </div>
+                      <span className="text-gray-300 font-medium">{event.phone}</span>
                     </div>
                   )}
                 </div>
@@ -239,16 +284,22 @@ function EventsPage() {
                     href={event.joinLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform group-hover:scale-105 inline-block text-center"
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform group-hover:scale-105 inline-block text-center shadow-lg hover:shadow-cyan-500/25"
                   >
-                    Join Event
+                    <span className="flex items-center justify-center space-x-2">
+                      <span>Join Event</span>
+                      <ExternalLink className="h-4 w-4" />
+                    </span>
                   </a>
                 ) : (
                   <button 
                     disabled
-                    className="w-full bg-gray-500 text-white font-semibold py-3 px-4 rounded-xl opacity-50 cursor-not-allowed"
+                    className="w-full bg-gray-500/50 text-gray-400 font-semibold py-3 px-4 rounded-xl cursor-not-allowed border border-gray-600/50"
                   >
-                    Join Link Not Available
+                    <span className="flex items-center justify-center space-x-2">
+                      <span>Join Link Not Available</span>
+                      <span className="text-xs">(Contact Organizer)</span>
+                    </span>
                   </button>
                 )}
               </div>

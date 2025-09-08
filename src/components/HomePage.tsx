@@ -64,15 +64,6 @@ function HomePage() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => navigate('/events')}
-                  className="group px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 border border-green-500/30"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-5 w-5" />
-                    <span>View Events</span>
-                  </div>
-                </button>
-                <button 
                   onClick={logout}
                   className="group px-6 py-3 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 border border-white/20"
                 >
