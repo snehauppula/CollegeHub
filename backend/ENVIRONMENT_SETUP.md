@@ -17,11 +17,14 @@ FRONTEND_URL=http://localhost:5173
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-# JWT Secret
+# JWT Secret (REQUIRED - Generate a secure random string)
 JWT_SECRET=your-super-secret-jwt-key
 
-# Session Secret
+# Session Secret (REQUIRED - Generate a secure random string)
 SESSION_SECRET=your-session-secret-key
+
+# Organizer Emails (Optional - comma-separated list of emails with organizer privileges)
+ORGANIZER_EMAILS=test@gmail.com,organizer@college.edu,admin@college.edu
 ```
 
 ## Google OAuth Setup Instructions
@@ -35,6 +38,23 @@ SESSION_SECRET=your-session-secret-key
    - `http://localhost:5000/api/auth/google/callback` (for development)
    - `https://yourdomain.com/api/auth/google/callback` (for production)
 7. Copy the Client ID and Client Secret to your `.env` file
+
+## Security Notes
+
+⚠️ **IMPORTANT**: Never commit your `.env` file to version control!
+
+- Generate strong, unique secrets for `JWT_SECRET` and `SESSION_SECRET`
+- Use a secure MongoDB connection string for production
+- Keep your Google OAuth credentials secure
+- The `ORGANIZER_EMAILS` variable allows you to specify which users have organizer privileges
+
+### Generating Secure Secrets
+
+You can generate secure secrets using:
+```bash
+# For JWT_SECRET and SESSION_SECRET
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
 
 ## Installation
 

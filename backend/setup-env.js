@@ -15,11 +15,14 @@ FRONTEND_URL=http://localhost:5173
 GOOGLE_CLIENT_ID=your-google-client-id-here
 GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 
-# JWT Secret
-JWT_SECRET=collegehub-super-secret-jwt-key-2024
+# JWT Secret (REQUIRED - Generate a secure random string)
+JWT_SECRET=your-super-secret-jwt-key-here
 
-# Session Secret
-SESSION_SECRET=collegehub-session-secret-key-2024
+# Session Secret (REQUIRED - Generate a secure random string)
+SESSION_SECRET=your-session-secret-key-here
+
+# Organizer Emails (Optional - comma-separated list of emails with organizer privileges)
+ORGANIZER_EMAILS=test@gmail.com,organizer@college.edu,admin@college.edu
 `;
 
 const envPath = path.join(__dirname, '.env');
