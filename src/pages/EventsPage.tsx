@@ -20,12 +20,12 @@ function EventsPage() {
     setError('');
     try {
       const eventsData = await fetchEvents();
-      setEvents(eventsData);
+    setEvents(eventsData);
     } catch (err) {
       setError('Failed to load events. Please try again.');
       console.error('Error fetching events:', err);
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
   };
 
@@ -201,7 +201,7 @@ function EventsPage() {
                       <span className="inline-flex items-center px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 animate-pulse"></span>
                         Join Link Available
-                      </span>
+                  </span>
                     )}
                   </div>
                   
@@ -241,21 +241,21 @@ function EventsPage() {
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors line-clamp-2">
                     {event.eventName}
-                  </h3>
+                </h3>
                   <p className="text-cyan-200 text-sm font-medium">{event.clubName}</p>
                 </div>
                 
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3 text-sm">
                     <div className="flex items-center justify-center w-8 h-8 bg-cyan-500/20 rounded-lg">
-                      <Calendar className="h-4 w-4 text-cyan-400" />
-                    </div>
+                    <Calendar className="h-4 w-4 text-cyan-400" />
+                  </div>
                     <span className="text-gray-300 font-medium">{event.eventDate}</span>
                   </div>
                   
                   <div className="flex items-center space-x-3 text-sm">
                     <div className="flex items-center justify-center w-8 h-8 bg-pink-500/20 rounded-lg">
-                      <MapPin className="h-4 w-4 text-pink-400" />
+                    <MapPin className="h-4 w-4 text-pink-400" />
                     </div>
                     <span className="text-gray-300 font-medium">{event.eventVenue}</span>
                   </div>
@@ -273,9 +273,9 @@ function EventsPage() {
                     <div className="flex items-center space-x-3 text-sm">
                       <div className="flex items-center justify-center w-8 h-8 bg-purple-500/20 rounded-lg">
                         <Phone className="h-4 w-4 text-purple-400" />
-                      </div>
+                  </div>
                       <span className="text-gray-300 font-medium">{event.phone}</span>
-                    </div>
+                  </div>
                   )}
                 </div>
                 
@@ -300,7 +300,7 @@ function EventsPage() {
                       <span>Join Link Not Available</span>
                       <span className="text-xs">(Contact Organizer)</span>
                     </span>
-                  </button>
+                </button>
                 )}
               </div>
             ))}
