@@ -129,15 +129,15 @@ function HomePage() {
             <div className="space-y-3 mb-6">
               <div className="flex items-center space-x-3 text-sm text-gray-300">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span>Live data sync with Google Sheets</span>
+                <span>Real-time MongoDB database integration</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-300">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <span>Events data stored in Excel format</span>
+                <span>Google OAuth authentication system</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-300">
                 <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                <span>Auto-refresh on application load</span>
+                <span>Organizer and student role management</span>
               </div>
             </div>
 
@@ -172,15 +172,15 @@ function HomePage() {
             <div className="space-y-3 mb-6">
               <div className="flex items-center space-x-3 text-sm text-gray-300">
                 <Users className="h-4 w-4 text-purple-400" />
-                <span>Student networking platform</span>
+                <span>Professional networking profiles</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-300">
                 <Globe className="h-4 w-4 text-cyan-400" />
-                <span>Cross-club collaboration tools</span>
+                <span>LinkedIn integration & skill showcase</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-300">
                 <Sparkles className="h-4 w-4 text-pink-400" />
-                <span>Project matching system</span>
+                <span>Student collaboration hub</span>
               </div>
             </div>
 

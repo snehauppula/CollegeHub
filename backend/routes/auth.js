@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { ORGANIZER_EMAILS } = require('../config/organizers');
 const passport = require('../config/googleOAuth');

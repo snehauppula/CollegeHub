@@ -7,6 +7,7 @@ const config = require('./config');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const projectRoutes = require('./routes/projects');
+const networkingRoutes = require('./routes/networking');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(passport.session());
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/networking', networkingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,63 +1,46 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
-  MessageCircle, 
   Users, 
   Briefcase, 
-  Code, 
-  Palette, 
-  BookOpen,
   Search,
   Filter,
-  Star,
-  Clock,
   ArrowRight,
   Linkedin,
   Plus,
-  Edit,
-  Trash2,
   ExternalLink,
   User,
   GraduationCap,
   MapPin,
-  Mail
+  Mail,
+  Loader2
 } from 'lucide-react';
+import { 
+  getNetworkingProfiles, 
+  createNetworkingProfile, 
+  getMyProfile,
+  NetworkingProfile as ApiNetworkingProfile,
+  CreateProfileData 
+} from '../utils/networkingApi';
 
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  skills: string[];
-  members: number;
-  maxMembers: number;
-  creator: string;
-  timeCommitment: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-}
 
-interface NetworkingProfile {
-  id: string;
-  name: string;
-  major: string;
-  year: string;
-  skills: string[];
-  linkedinUrl: string;
-  bio: string;
-  interests: string[];
-  location: string;
-  email: string;
-  profileImage?: string;
-}
+// Using the API interface from networkingApi.ts
+type NetworkingProfile = ApiNetworkingProfile;
 
 function CollaborationPage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'projects' | 'networking'>('projects');
   const [searchTerm, setSearchTerm] = useState('');
   const [skillFilter, setSkillFilter] = useState('');
   const [showCreateProfile, setShowCreateProfile] = useState(false);
-  const [newProfile, setNewProfile] = useState<Partial<NetworkingProfile>>({
+  const [profiles, setProfiles] = useState<NetworkingProfile[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
+  const [newProfile, setNewProfile] = useState<Partial<CreateProfileData>>({
     name: '',
     major: '',
     year: '',
@@ -71,115 +54,49 @@ function CollaborationPage() {
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
 
-  const mockProjects: Project[] = [
-    {
-      id: '1',
-      title: 'Campus Sustainability App',
-      description: 'Building a mobile app to track and reduce campus carbon footprint with gamification elements.',
-      category: 'Technology',
-      skills: ['React Native', 'Node.js', 'UI/UX Design'],
-      members: 3,
-      maxMembers: 6,
-      creator: 'Sarah Chen',
-      timeCommitment: '10-15 hours/week',
-      difficulty: 'Intermediate'
-    },
-    {
-      id: '2',
-      title: 'Student Mental Health Research',
-      description: 'Conducting research on student wellness and developing support resources for the campus community.',
-      category: 'Research',
-      skills: ['Psychology', 'Data Analysis', 'Survey Design'],
-      members: 2,
-      maxMembers: 5,
-      creator: 'Dr. Martinez',
-      timeCommitment: '5-8 hours/week',
-      difficulty: 'Advanced'
-    },
-    {
-      id: '3',
-      title: 'Campus Art Installation',
-      description: 'Creating an interactive digital art piece for the new student center lobby.',
-      category: 'Creative',
-      skills: ['Digital Art', 'Arduino', 'Creative Writing'],
-      members: 4,
-      maxMembers: 8,
-      creator: 'Alex Rivera',
-      timeCommitment: '8-12 hours/week',
-      difficulty: 'Beginner'
+  // Load networking profiles
+  const loadProfiles = async () => {
+    setLoading(true);
+    try {
+      const response = await getNetworkingProfiles();
+      if (response.success && response.data) {
+        setProfiles(response.data);
+      }
+    } catch (err) {
+      console.error('Error loading profiles:', err);
+      setError('Failed to load profiles');
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const mockNetworkingProfiles: NetworkingProfile[] = [
-    {
-      id: '1',
-      name: 'Priya Sharma',
-      major: 'Computer Science',
-      year: '3rd Year',
-      skills: ['React', 'Python', 'Machine Learning', 'UI/UX Design'],
-      linkedinUrl: 'https://linkedin.com/in/priya-sharma-cs',
-      bio: 'Passionate about AI and web development. Looking to collaborate on innovative projects and connect with fellow developers.',
-      interests: ['Artificial Intelligence', 'Web Development', 'Open Source'],
-      location: 'Hyderabad',
-      email: 'priya.sharma@college.edu'
-    },
-    {
-      id: '2',
-      name: 'Arjun Patel',
-      major: 'Business Administration',
-      year: '2nd Year',
-      skills: ['Digital Marketing', 'Data Analysis', 'Project Management', 'Leadership'],
-      linkedinUrl: 'https://linkedin.com/in/arjun-patel-business',
-      bio: 'Entrepreneurial mindset with experience in startup environments. Interested in connecting with tech-savvy students for business ventures.',
-      interests: ['Entrepreneurship', 'Startups', 'Digital Marketing'],
-      location: 'Mumbai',
-      email: 'arjun.patel@college.edu'
-    },
-    {
-      id: '3',
-      name: 'Sneha Reddy',
-      major: 'Electronics Engineering',
-      year: '4th Year',
-      skills: ['IoT', 'Arduino', 'Embedded Systems', 'Python'],
-      linkedinUrl: 'https://linkedin.com/in/sneha-reddy-iot',
-      bio: 'IoT enthusiast working on smart campus solutions. Always excited to mentor juniors and collaborate on hardware projects.',
-      interests: ['Internet of Things', 'Smart Cities', 'Mentoring'],
-      location: 'Bangalore',
-      email: 'sneha.reddy@college.edu'
-    },
-    {
-      id: '4',
-      name: 'Rahul Kumar',
-      major: 'Data Science',
-      year: '3rd Year',
-      skills: ['Python', 'R', 'SQL', 'Tableau', 'Statistics'],
-      linkedinUrl: 'https://linkedin.com/in/rahul-kumar-datascience',
-      bio: 'Data science student passionate about solving real-world problems through analytics. Looking for study groups and project collaborations.',
-      interests: ['Data Analytics', 'Machine Learning', 'Research'],
-      location: 'Delhi',
-      email: 'rahul.kumar@college.edu'
-    }
-  ];
-
-  const getCategoryIcon = (category: string) => {
-    const icons = {
-      'Technology': Code,
-      'Research': BookOpen,
-      'Creative': Palette,
-      'Business': Briefcase
-    };
-    const IconComponent = icons[category as keyof typeof icons] || Code;
-    return <IconComponent className="h-5 w-5" />;
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    const colors = {
-      'Beginner': 'text-green-400 bg-green-400/20',
-      'Intermediate': 'text-yellow-400 bg-yellow-400/20',
-      'Advanced': 'text-red-400 bg-red-400/20'
-    };
-    return colors[difficulty as keyof typeof colors] || 'text-gray-400 bg-gray-400/20';
+  // Check if current user has a profile
+  const checkUserProfile = async () => {
+    if (!isAuthenticated) return;
+    
+    try {
+      const response = await getMyProfile();
+      if (response.success && response.data) {
+        // User already has a profile, show different UI
+        setError('You already have a networking profile. You can only create one profile per account.');
+        return true;
+      }
+    } catch (err) {
+      // User doesn't have a profile yet, which is fine
+      console.log('User does not have a profile yet');
+    }
+    return false;
   };
+
+  useEffect(() => {
+    if (activeTab === 'networking') {
+      loadProfiles();
+      if (isAuthenticated) {
+        checkUserProfile();
+      }
+    }
+  }, [activeTab, isAuthenticated]);
+
 
   const getSkillColor = (skill: string) => {
     const colors = [
@@ -194,7 +111,7 @@ function CollaborationPage() {
     return colors[index];
   };
 
-  const filteredProfiles = mockNetworkingProfiles.filter(profile => {
+  const filteredProfiles = profiles.filter(profile => {
     const matchesSearch = profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          profile.major.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          profile.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -242,10 +159,87 @@ function CollaborationPage() {
     }
   };
 
-  const handleCreateProfile = () => {
-    // Here you would typically save to a database
-    console.log('Creating profile:', newProfile);
-    // For now, just close the modal and reset the form
+  const handleCreateProfile = async () => {
+    // Check if user is authenticated
+    if (!isAuthenticated || !user) {
+      setError('Please log in to create a networking profile');
+      return;
+    }
+
+    // Validate required fields with specific messages
+    if (!newProfile.name?.trim()) {
+      setError('Please enter your full name');
+      return;
+    }
+    if (!newProfile.major?.trim()) {
+      setError('Please enter your major');
+      return;
+    }
+    if (!newProfile.year) {
+      setError('Please select your year');
+      return;
+    }
+    if (!newProfile.skills || newProfile.skills.length === 0) {
+      setError('Please add at least one skill');
+      return;
+    }
+    if (!newProfile.linkedinUrl?.trim()) {
+      setError('Please enter your LinkedIn URL');
+      return;
+    }
+    // Validate LinkedIn URL format
+    if (!newProfile.linkedinUrl.includes('linkedin.com/in/')) {
+      setError('Please enter a valid LinkedIn URL (e.g., https://linkedin.com/in/your-profile)');
+      return;
+    }
+    if (!newProfile.bio?.trim()) {
+      setError('Please enter your bio');
+      return;
+    }
+    if (newProfile.bio.trim().length < 10) {
+      setError('Bio must be at least 10 characters long');
+      return;
+    }
+    if (!newProfile.interests || newProfile.interests.length === 0) {
+      setError('Please add at least one interest');
+      return;
+    }
+    if (!newProfile.location?.trim()) {
+      setError('Please enter your location');
+      return;
+    }
+    if (!newProfile.email?.trim()) {
+      setError('Please enter your email');
+      return;
+    }
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newProfile.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setCreating(true);
+    setError('');
+
+    try {
+      const profileData = {
+        name: newProfile.name,
+        major: newProfile.major,
+        year: newProfile.year,
+        skills: newProfile.skills,
+        linkedinUrl: newProfile.linkedinUrl,
+        bio: newProfile.bio,
+        interests: newProfile.interests,
+        location: newProfile.location,
+        email: newProfile.email
+      };
+
+      const response = await createNetworkingProfile(profileData);
+      
+      if (response.success && response.data) {
+        // Add the new profile to the list
+        setProfiles(prev => [response.data!, ...prev]);
     setShowCreateProfile(false);
     setNewProfile({
       name: '',
@@ -258,10 +252,22 @@ function CollaborationPage() {
       location: '',
       email: ''
     });
+        setNewSkill('');
+        setNewInterest('');
+      } else {
+        setError(response.message || 'Failed to create profile');
+      }
+    } catch (err: any) {
+      console.error('Error creating profile:', err);
+      setError(err.message || 'Failed to create profile. Please try again.');
+    } finally {
+      setCreating(false);
+    }
   };
 
   const handleCloseModal = () => {
     setShowCreateProfile(false);
+    setError('');
     setNewProfile({
       name: '',
       major: '',
@@ -344,14 +350,34 @@ function CollaborationPage() {
           <div>
             {/* Header Section */}
             <div className="mb-8">
+              {/* Authentication Notice */}
+              {!isAuthenticated && (
+                <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
+                  <p className="text-yellow-300 text-sm">
+                    Please log in to create your networking profile and connect with other students.
+                  </p>
+                </div>
+              )}
+              
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-2">Skill Showcase Network</h2>
                   <p className="text-gray-300">Connect with like-minded students and showcase your expertise</p>
                 </div>
                 <button
-                  onClick={() => setShowCreateProfile(true)}
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      setError('Please log in to create a networking profile');
+                      return;
+                    }
+                    setShowCreateProfile(true);
+                  }}
+                  disabled={!isAuthenticated}
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    isAuthenticated 
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transform hover:scale-105' 
+                      : 'bg-gray-500/50 text-gray-400 cursor-not-allowed'
+                  }`}
                 >
                   <Plus className="h-5 w-5" />
                   <span>Create Profile</span>
@@ -384,9 +410,17 @@ function CollaborationPage() {
             </div>
 
             {/* Profiles Grid */}
+            {loading ? (
+              <div className="flex justify-center items-center py-16">
+                <div className="flex items-center space-x-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+                  <span className="text-white text-lg">Loading profiles...</span>
+                </div>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProfiles.map((profile) => (
-                <div key={profile.id} className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/10">
+                <div key={profile._id} className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/10">
                   {/* Profile Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
@@ -475,9 +509,10 @@ function CollaborationPage() {
                 </div>
               ))}
             </div>
+            )}
 
             {/* Empty State */}
-            {filteredProfiles.length === 0 && (
+            {!loading && filteredProfiles.length === 0 && (
               <div className="text-center py-16">
                 <div className="w-24 h-24 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center">
                   <Users className="h-12 w-12 text-gray-400" />
@@ -485,8 +520,19 @@ function CollaborationPage() {
                 <h3 className="text-xl font-semibold text-white mb-2">No Profiles Found</h3>
                 <p className="text-gray-400 mb-6">Try adjusting your search or create your own profile!</p>
                 <button
-                  onClick={() => setShowCreateProfile(true)}
-                  className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      setError('Please log in to create a networking profile');
+                      return;
+                    }
+                    setShowCreateProfile(true);
+                  }}
+                  disabled={!isAuthenticated}
+                  className={`inline-flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    isAuthenticated 
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transform hover:scale-105' 
+                      : 'bg-gray-500/50 text-gray-400 cursor-not-allowed'
+                  }`}
                 >
                   <Plus className="h-5 w-5" />
                   <span>Create Your Profile</span>
@@ -507,10 +553,18 @@ function CollaborationPage() {
                   <button
                     onClick={handleCloseModal}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    disabled={creating}
                   >
                     <span className="text-white text-xl">×</span>
                   </button>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl">
+                    <p className="text-red-300 text-sm">{error}</p>
+                  </div>
+                )}
 
                 {/* Form */}
                 <div className="space-y-6">
@@ -585,6 +639,7 @@ function CollaborationPage() {
                       onChange={(e) => setNewProfile({...newProfile, linkedinUrl: e.target.value})}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
                       placeholder="https://linkedin.com/in/your-profile"
+                        required
                     />
                   </div>
 
@@ -595,13 +650,18 @@ function CollaborationPage() {
                       onChange={(e) => setNewProfile({...newProfile, bio: e.target.value})}
                       rows={3}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
-                      placeholder="Tell us about yourself, your interests, and what you're looking for..."
+                      placeholder="Tell us about yourself, your interests, and what you're looking for... (minimum 10 characters)"
+                      required
                     />
+                    <p className="text-xs text-gray-400 mt-1">
+                      {newProfile.bio?.length || 0}/500 characters (minimum 10)
+                    </p>
                   </div>
 
                   {/* Skills */}
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">Skills</label>
+                    <label className="block text-sm font-medium text-white mb-2">Skills *</label>
+                    <p className="text-xs text-gray-400 mb-2">Add at least one skill (e.g., React, Python, Design)</p>
                     <div className="flex gap-2 mb-3">
                       <input
                         type="text"
@@ -638,7 +698,8 @@ function CollaborationPage() {
 
                   {/* Interests */}
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">Interests</label>
+                    <label className="block text-sm font-medium text-white mb-2">Interests *</label>
+                    <p className="text-xs text-gray-400 mb-2">Add at least one interest (e.g., AI, Entrepreneurship, Music)</p>
                     <div className="flex gap-2 mb-3">
                       <input
                         type="text"
@@ -679,14 +740,23 @@ function CollaborationPage() {
                   <button
                     onClick={handleCloseModal}
                     className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors"
+                    disabled={creating}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleCreateProfile}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+                    disabled={creating}
+                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-2"
                   >
-                    Create Profile
+                    {creating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <span>Create Profile</span>
+                    )}
                   </button>
                 </div>
               </div>
