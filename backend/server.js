@@ -8,7 +8,7 @@ const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const projectRoutes = require('./routes/projects');
 const networkingRoutes = require('./routes/networking');
-
+const alumniRoutes = require('./routes/alumni');
 const app = express();
 
 // Middleware
@@ -38,7 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/networking', networkingRoutes);
-
+app.use('/api/alumni', alumniRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ message: 'College Hub API is running!' });

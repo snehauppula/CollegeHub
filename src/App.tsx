@@ -8,7 +8,7 @@ import LoginPage from './pages/LoginPage';
 import OrganizerLoginPage from './pages/OrganizerLoginPage';
 import StudentLoginPage from './pages/StudentLoginPage';
 import AlumniEmailPage from './pages/AlumniEmailPage';
-import AlumniLinkedInPage from './pages/AlumniLinkedInPage';
+
 import CreateEventPage from './pages/CreateEventPage';
 import ProjectsPage from './pages/ProjectsPage';
 
@@ -27,7 +27,7 @@ function App() {
         <Route path="/organizer-login" element={<OrganizerLoginPage />} />
         <Route path="/student-login" element={<StudentLoginPage />} />
         <Route path="/alumni/email" element={<AlumniEmailPage />} />
-        <Route path="/alumni/linkedin" element={<AlumniLinkedInPage />} />
+
       </Routes>
     </AuthProvider>
   );
