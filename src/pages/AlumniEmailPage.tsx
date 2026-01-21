@@ -1,293 +1,285 @@
-import React, { useState } from 'react';
-import Layout from '../components/Layout';
-import { 
-  Mail, 
-  Search, 
-  Filter, 
-  MapPin, 
-  Briefcase, 
-  Calendar,
-  Copy,
-  Star,
-  Send,
-  GraduationCap
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Layout from "../components/Layout";
+import { Linkedin, Search, ExternalLink, PlusCircle, Loader2, Calendar, Briefcase } from "lucide-react";
 
-interface AlumniContact {
-  id: string;
+interface AlumniProfile {
+  _id?: string;
   name: string;
-  graduationYear: string;
-  major: string;
-  currentPosition: string;
-  company: string;
-  location: string;
   email: string;
-  profileImage: string;
-  responseTime: string;
-  rating: number;
-  specialties: string[];
-  mentorshipAvailable: boolean;
+  linkedin?: string;
+  company?: string;
+  jobRole?: string;
+  graduationYear?: number;
+  createdAt?: string;
 }
 
-function AlumniEmailPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
-  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+const AlumniLinkedInPage: React.FC = () => {
+  const [alumniList, setAlumniList] = useState<AlumniProfile[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [newAlumni, setNewAlumni] = useState<AlumniProfile>({
+    name: "",
+    email: "",
+    linkedin: "",
+    company: "",
+    jobRole: "",
+    graduationYear: undefined,
+  });
 
-  const mockContacts: AlumniContact[] = [
-    {
-      id: '1',
-      name: 'Jennifer Walsh',
-      graduationYear: '2017',
-      major: 'Computer Science',
-      currentPosition: 'Tech Lead',
-      company: 'Apple',
-      location: 'Cupertino, CA',
-      email: 'jennifer.walsh@apple.com',
-      profileImage: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      responseTime: 'Usually responds within 2 hours',
-      rating: 4.9,
-      specialties: ['iOS Development', 'Team Leadership', 'Career Guidance'],
-      mentorshipAvailable: true
-    },
-    {
-      id: '2',
-      name: 'Robert Martinez',
-      graduationYear: '2016',
-      major: 'Business Administration',
-      currentPosition: 'VP of Operations',
-      company: 'Amazon',
-      location: 'Seattle, WA',
-      email: 'robert.martinez@amazon.com',
-      profileImage: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      responseTime: 'Usually responds within 1 day',
-      rating: 4.8,
-      specialties: ['Operations Management', 'Strategic Planning', 'Entrepreneurship'],
-      mentorshipAvailable: true
-    },
-    {
-      id: '3',
-      name: 'Lisa Thompson',
-      graduationYear: '2019',
-      major: 'Marketing',
-      currentPosition: 'Creative Director',
-      company: 'Nike',
-      location: 'Portland, OR',
-      email: 'lisa.thompson@nike.com',
-      profileImage: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      responseTime: 'Usually responds within 4 hours',
-      rating: 4.7,
-      specialties: ['Brand Marketing', 'Creative Strategy', 'Design Thinking'],
-      mentorshipAvailable: false
-    },
-    {
-      id: '4',
-      name: 'James Wilson',
-      graduationYear: '2015',
-      major: 'Engineering',
-      currentPosition: 'Principal Engineer',
-      company: 'SpaceX',
-      location: 'Hawthorne, CA',
-      email: 'james.wilson@spacex.com',
-      profileImage: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      responseTime: 'Usually responds within 6 hours',
-      rating: 4.9,
-      specialties: ['Aerospace Engineering', 'Systems Design', 'Innovation'],
-      mentorshipAvailable: true
-    }
-  ];
+  // ✅ Fetch Alumni List
+  useEffect(() => {
+    fetchAlumni();
+  }, []);
 
-  const copyEmail = async (email: string) => {
+  const fetchAlumni = async () => {
+    setLoading(true);
     try {
-      await navigator.clipboard.writeText(email);
-      setCopiedEmail(email);
-      setTimeout(() => setCopiedEmail(null), 2000);
+      const { data } = await axios.get("http://localhost:5000/api/alumni");
+      // ✅ Sort by Graduation Year (latest first)
+      const sortedData = data.sort(
+        (a: AlumniProfile, b: AlumniProfile) => (b.graduationYear || 0) - (a.graduationYear || 0)
+      );
+      setAlumniList(sortedData);
     } catch (err) {
-      console.error('Failed to copy email:', err);
+      console.error("Error fetching alumni:", err);
+      alert("Failed to fetch alumni list!");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredContacts = mockContacts.filter(contact => {
-    const matchesSearch = contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contact.major.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contact.company.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (selectedFilter === 'all') return matchesSearch;
-    if (selectedFilter === 'mentors') return matchesSearch && contact.mentorshipAvailable;
-    return matchesSearch && contact.major.toLowerCase().includes(selectedFilter.toLowerCase());
-  });
+  // ✅ Handle Input Change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewAlumni({ ...newAlumni, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Submit New Alumni
+  const handleAddAlumni = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAlumni.name || !newAlumni.email || !newAlumni.graduationYear) {
+      return alert("Name, email, and graduation year are required!");
+    }
+
+    try {
+      const { data } = await axios.post("http://localhost:5000/api/alumni", newAlumni);
+      setAlumniList([data, ...alumniList]);
+      setNewAlumni({
+        name: "",
+        email: "",
+        linkedin: "",
+        company: "",
+        jobRole: "",
+        graduationYear: undefined,
+      });
+      setShowForm(false);
+    } catch (err) {
+      console.error("Error adding alumni:", err);
+      alert("Failed to add alumni!");
+    }
+  };
+
+  // ✅ Filter Alumni by Search (includes job role)
+  const filteredAlumni = alumniList.filter(
+    (alumni) =>
+      alumni.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alumni.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (alumni.company && alumni.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (alumni.jobRole && alumni.jobRole.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (alumni.graduationYear &&
+        alumni.graduationYear.toString().includes(searchTerm.toLowerCase()))
+  );
 
   return (
-    <Layout title="Alumni Email Directory">
+    <Layout title="Alumni LinkedIn Network">
       <div className="py-8">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl w-fit mx-auto mb-6">
-            <Mail className="h-16 w-16 text-white" />
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Alumni Network</h1>
+            <p className="text-gray-300">Connect and grow your professional network</p>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">Alumni Email Directory</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Direct access to verified alumni email contacts for mentorship and professional guidance
-          </p>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl transition-all duration-300"
+          >
+            <PlusCircle className="h-5 w-5" />
+            {showForm ? "Close Form" : "Add Alumni"}
+          </button>
         </div>
 
-        {/* Search and Filter Section */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by name, major, or company..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-400 transition-all duration-300"
-            />
-          </div>
-          <div className="flex space-x-3">
-            <select
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:border-red-400 transition-all duration-300"
-            >
-              <option value="all">All Alumni</option>
-              <option value="mentors">Available Mentors</option>
-              <option value="computer">Computer Science</option>
-              <option value="business">Business</option>
-              <option value="engineering">Engineering</option>
-              <option value="marketing">Marketing</option>
-            </select>
-            <button className="flex items-center space-x-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all duration-300">
-              <Filter className="h-5 w-5" />
-              <span>Advanced</span>
-            </button>
-          </div>
+        {/* Add Alumni Form */}
+        {showForm && (
+          <form
+            onSubmit={handleAddAlumni}
+            className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl mb-6 border border-white/20 transition-all duration-300"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Name */}
+              <div>
+                <label className="block text-gray-200 mb-1 font-medium">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter full name"
+                  value={newAlumni.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 placeholder-gray-400"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-gray-200 mb-1 font-medium">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter email address"
+                  value={newAlumni.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 placeholder-gray-400"
+                />
+              </div>
+
+              {/* LinkedIn */}
+              <div>
+                <label className="block text-gray-200 mb-1 font-medium">LinkedIn Profile</label>
+                <input
+                  type="text"
+                  name="linkedin"
+                  placeholder="https://linkedin.com/in/username"
+                  value={newAlumni.linkedin}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 placeholder-gray-400"
+                />
+              </div>
+
+              {/* Company */}
+              <div>
+                <label className="block text-gray-200 mb-1 font-medium">Company</label>
+                <input
+                  type="text"
+                  name="company"
+                  placeholder="Enter company name"
+                  value={newAlumni.company}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 placeholder-gray-400"
+                />
+              </div>
+
+              {/* Job Role */}
+              <div>
+                <label className="block text-gray-200 mb-1 font-medium">Job Role</label>
+                <input
+                  type="text"
+                  name="jobRole"
+                  placeholder="e.g. Software Engineer"
+                  value={newAlumni.jobRole}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 placeholder-gray-400"
+                />
+              </div>
+
+              {/* Graduation Year */}
+              <div>
+                <label className="block text-gray-200 mb-1 font-medium">Graduation Year</label>
+                <input
+                  type="number"
+                  name="graduationYear"
+                  placeholder="e.g. 2025"
+                  value={newAlumni.graduationYear || ""}
+                  onChange={handleInputChange}
+                  required
+                  min="1980"
+                  max={new Date().getFullYear() + 5}
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl transition-all duration-300"
+              >
+                Save Alumni
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Search Bar */}
+        <div className="relative mb-6">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search alumni by name, email, company, job role, or year..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 transition-all duration-300"
+          />
         </div>
 
-        {/* Contacts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredContacts.map((contact) => (
-            <div key={contact.id} className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-red-300/30 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl hover:shadow-red-500/20">
-              {/* Profile Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={contact.profileImage}
-                    alt={contact.name}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-red-400/30"
-                  />
-                  <div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-red-300 transition-colors">
-                      {contact.name}
-                    </h3>
-                    <div className="flex items-center space-x-2 text-sm text-red-200">
-                      <GraduationCap className="h-4 w-4" />
-                      <span>Class of {contact.graduationYear}</span>
+        {/* Alumni List */}
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader2 className="animate-spin h-8 w-8 text-blue-400" />
+          </div>
+        ) : filteredAlumni.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAlumni.map((alumni) => (
+              <div
+                key={alumni._id}
+                className="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-blue-300/30 transition-all duration-300 hover:scale-105"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">
+                    {alumni.name}
+                  </h3>
+                  {alumni.graduationYear && (
+                    <div className="flex items-center gap-1 text-sm text-green-400 font-medium">
+                      <Calendar className="h-4 w-4" />
+                      {alumni.graduationYear}
                     </div>
-                    <p className="text-sm text-gray-300">{contact.major}</p>
-                  </div>
+                  )}
                 </div>
-                {contact.mentorshipAvailable && (
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
-                    Mentor
-                  </span>
+                <p className="text-sm text-gray-300">{alumni.email}</p>
+                {alumni.company && (
+                  <p className="text-blue-300 text-sm">{alumni.company}</p>
                 )}
-              </div>
+                {alumni.jobRole && (
+                  <p className="text-gray-200 text-sm flex items-center gap-1 mt-1">
+                    <Briefcase className="h-4 w-4 text-yellow-400" />
+                    {alumni.jobRole}
+                  </p>
+                )}
 
-              {/* Current Position */}
-              <div className="mb-4">
-                <div className="flex items-center space-x-2 mb-1">
-                  <Briefcase className="h-4 w-4 text-purple-400" />
-                  <span className="text-white font-semibold">{contact.currentPosition}</span>
-                </div>
-                <p className="text-cyan-300 text-sm">{contact.company}</p>
-                <div className="flex items-center space-x-2 mt-1">
-                  <MapPin className="h-3 w-3 text-gray-400" />
-                  <span className="text-gray-300 text-xs">{contact.location}</span>
-                </div>
-              </div>
-
-              {/* Email Section */}
-              <div className="bg-white/5 rounded-xl p-4 mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-300">Email Address</span>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                    <span className="text-xs text-yellow-400">{contact.rating}</span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <code className="flex-1 text-sm text-cyan-300 bg-black/20 px-3 py-2 rounded-lg">
-                    {contact.email}
-                  </code>
-                  <button
-                    onClick={() => copyEmail(contact.email)}
-                    className="p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-300 transition-all duration-300"
-                  >
-                    {copiedEmail === contact.email ? (
-                      <span className="text-xs">Copied!</span>
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-400 mt-2">{contact.responseTime}</p>
-              </div>
-
-              {/* Specialties */}
-              <div className="mb-4">
-                <div className="flex flex-wrap gap-2">
-                  {contact.specialties.map((specialty, index) => (
-                    <span key={index} className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded-full border border-red-500/30">
-                      {specialty}
-                    </span>
-                  ))}
+                <div className="mt-4 flex gap-2">
+                  {alumni.linkedin && (
+                    <a
+                      href={alumni.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <Linkedin className="h-4 w-4" />
+                      Connect
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => window.open(`mailto:${contact.email}`, '_blank')}
-                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform group-hover:scale-105 flex items-center justify-center space-x-2"
-                >
-                  <Send className="h-4 w-4" />
-                  <span>Send Email</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Contact Guidelines */}
-        <div className="mt-12 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-            <Mail className="h-5 w-5 text-red-400" />
-            <span>Email Guidelines</span>
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-            <div>
-              <h4 className="font-semibold text-white mb-2">Best Practices:</h4>
-              <ul className="space-y-1">
-                <li>• Be specific about your goals</li>
-                <li>• Keep initial emails concise</li>
-                <li>• Mention your college connection</li>
-                <li>• Be respectful of their time</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-2">Response Times:</h4>
-              <ul className="space-y-1">
-                <li>• Most alumni respond within 24-48 hours</li>
-                <li>• Mentors typically respond faster</li>
-                <li>• Follow up politely after 1 week</li>
-                <li>• Be patient during busy periods</li>
-              </ul>
-            </div>
+            ))}
           </div>
-        </div>
+        ) : (
+          <p className="text-center text-gray-400 mt-6">No alumni found.</p>
+        )}
       </div>
     </Layout>
   );
-}
+};
 
-export default AlumniEmailPage;
+export default AlumniLinkedInPage;

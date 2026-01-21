@@ -214,42 +214,23 @@ function HomePage() {
                   <Mail className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Email Directory</h3>
+                  <h3 className="text-lg font-semibold text-white">Alumni Network</h3>
                   <p className="text-sm text-gray-300">Direct communication</p>
                 </div>
               </div>
               <p className="text-gray-300 text-sm mb-4">
-                Access verified alumni email contacts for direct professional communication and mentorship requests.
+                Access verified alumni  for direct professional communication and mentorship requests.
               </p>
               <button 
                 onClick={() => navigate('/alumni/email')}
                 className="w-full bg-red-500 hover:bg-red-400 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300"
               >
-                Browse Email Directory
+                Browse Alumni
               </button>
             </div>
 
-            {/* LinkedIn Integration */}
-            <div className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:border-blue-300/30 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="p-3 bg-blue-600 rounded-xl">
-                  <Linkedin className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">LinkedIn Network</h3>
-                  <p className="text-sm text-gray-300">Professional connections</p>
-                </div>
-              </div>
-              <p className="text-gray-300 text-sm mb-4">
-                Explore alumni LinkedIn profiles, career paths, and professional achievements for career inspiration.
-              </p>
-              <button 
-                onClick={() => navigate('/alumni/linkedin')}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300"
-              >
-                Explore LinkedIn Network
-              </button>
-            </div>
+
+
           </div>
         </section>
       </main>
