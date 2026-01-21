@@ -4,6 +4,7 @@
   "description": "Backend API for College Hub",
   "main": "server.js",
   "scripts": {
+    "build": "echo Backend build complete",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
