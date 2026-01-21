@@ -46,7 +46,7 @@ export interface ApiResponse<T> {
   };
 }
 
-const API_BASE_URL = 'http://localhost:5000/api/networking';
+const API_BASE_URL = 'https://collegehub-xyp6.onrender.com/api/networking';
 
 // Helper function to get auth token
 const getAuthToken = (): string | null => {

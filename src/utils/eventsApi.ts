@@ -30,7 +30,7 @@ export interface CreateEventData {
   description?: string;
 }
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://collegehub-xyp6.onrender.com/api';
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
